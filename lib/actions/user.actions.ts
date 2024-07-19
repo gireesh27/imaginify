@@ -7,7 +7,7 @@ import { connectToDatabase } from "../database/mongoose";
 import { handleError } from "../utils";
 
 // CREATE
-export async function createUser(user: CreateUserParams) {
+export async function createUser(user: { clerkId: string; email: string; username: string; firstName: string | null; lastName: string | null; photo: string; }) {
   try {
     await connectToDatabase();
 
