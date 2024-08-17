@@ -1,6 +1,6 @@
 "use client"
 import { z } from "zod"
- import { useState } from "react"
+ import { useState, useTransition } from "react"
 export const formSchema = z.object({
   title:z.string(),
   aspectRatio:z.string().optional(),
@@ -34,20 +34,25 @@ import {
     SelectTrigger,
     SelectValue,
   } from "@/components/ui/select"
-import { AspectRatioKey } from "@/lib/utils"
+import { AspectRatioKey, debounce, deepMergeObjects } from "@/lib/utils"
+import { updateCredits } from "@/lib/actions/user.actions"
   
 const TransformationForm = ({action ,data = null,userId,type,creditBalance,config=null}:TransformationFormProps) => {
 
     const [isSubmitting,setIssubmitting]=useState(false);
 
-    const [isTransforming,setTransforming]=useState(false);
+    const [isTransforming,setIsTransforming]=useState(false);
 
     const [transformationConfig,setTransformationConfig]=useState(config);
 
     const transformationType = transformationTypes[type];
     
     const [image,setImage]=useState(data);
+
     const [newTransformation,setNewTransformation] = useState<Transformations | null >(null);
+
+    const [isPending,startTransition] = useTransition()
+
     const initialValues = data && action ==='Update' ?{
         title:data?.title,
         aspectRatio:data?.aspectRatio,
@@ -55,26 +60,57 @@ const TransformationForm = ({action ,data = null,userId,type,creditBalance,confi
         prompt:data?.prompt,
         publicId:data?.publicId,
     } : defaultValues
+
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: initialValues,
       })
      
       // 2. Define a submit handler.
+
       function onSubmit(values: z.infer<typeof formSchema>) {
         console.log(values)
       }
 
       //function Handlers
       const onSelectFieldHandler=(value:string,onChangeField:(value:string)=>void)=>{
-
+        const imageSize = aspectRatioOptions[value as AspectRatioKey]
+        setImage((prevState:any)=>({
+          ...prevState,
+          aspectRatio:imageSize.aspectRatio,
+          width:imageSize.width,
+          height:imageSize.height,
+        }))
+         setNewTransformation(transformationType.config);
+         return onChangeField(value);
       }
+
       const onInputChangeHandler=(fieldName: string, value: string, type: string, onChangeField: (value: string) => void)=>{
-
+         debounce(()=>{
+          setNewTransformation((prevState:any)=>({
+            ...prevState,
+            [type]:{
+              ...prevState?.[type],
+              [fieldName==='prompt'? 'prompt':'to']:value,
+            }
+          }))
+         },1000);
+      return onChangeField(value);
       }
+      
+      //Retun to updateCredits
       const onTransformHandler=()=>{
-        
+        setIsTransforming(true);
+
+        setTransformationConfig(
+          deepMergeObjects(newTransformation,transformationConfig)
+        )
+        setNewTransformation(null)
+        startTransition( async ()=>{
+          // await updateCredits(userId,CreditFee)
+        })
       }
+
         return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
@@ -157,7 +193,7 @@ const TransformationForm = ({action ,data = null,userId,type,creditBalance,confi
        </Button>
 
         </div>
-       
+        
       </form>
     </Form>
   )
