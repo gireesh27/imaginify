@@ -53,13 +53,10 @@ export const Collection = ({
         {hasSearch && <Search />}
       </div>
 
-      {images.length > 0 ? (
+      {images && images.length > 0 ? (
         <ul className="collection-list">
-          {images.map((image,index) => (
-            <Card
-            key={image.__v | index}
-            image={image}
-            />
+          {images.map((image, index) => (
+            <Card key={image.__v ?? index} image={image} />
           ))}
         </ul>
       ) : (
@@ -99,7 +96,7 @@ export const Collection = ({
 
 const Card = ({ image }: { image: IImage }) => {
   return (
-    <li >
+    <li>
       <Link href={`/transformations/${image._id}`} className="collection-card">
         <CldImage
           src={image.publicId}
