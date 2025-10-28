@@ -137,17 +137,6 @@ imaginify/
 
 **Gireesh Kasa**
 B.Tech – NIT Warangal
-[Portfolio](#) • [LinkedIn](#) • [GitHub](#)
-
 ---
 
-## 🪪 License
-
-This project is licensed under the **MIT License** — free to use and modify.
-
----
-
-### ⭐ If you like this project, give it a star on GitHub!
-
-```
 
