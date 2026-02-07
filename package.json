@@ -24,7 +24,7 @@
     "lucide-react": "^0.408.0",
     "mongodb": "^6.8.0",
     "mongoose": "^8.5.1",
-    "next": "14.2.5",
+    "next": "14.2.35",
     "next-cloudinary": "^6.10.0",
     "node": "^20.16.0",
     "qs": "^6.12.3",
